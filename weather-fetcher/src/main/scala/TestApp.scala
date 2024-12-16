@@ -1,4 +1,5 @@
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.{current_timestamp, lit}
+import org.apache.spark.sql.{Dataset, Row, SparkSession}
 
 object TestApp {
   def main(args: Array[String]): Unit = {
@@ -8,6 +9,19 @@ object TestApp {
       .master("local")
       .getOrCreate()
 
-    spark.read.json("current/Lodz/*").show()
+    val city: String = args(0)
+
+    val weatherDF: Dataset[Row] = spark.read.json(s"current/$city/*")
+
+    weatherDF.show(false)
+
+    weatherDF.printSchema()
+
+    val finalDF = weatherDF.select("current.*", "latitude", "longitude", "timezone", "timezone_abbreviation", "utc_offset_seconds")
+      .withColumn("city", lit(city))
+      .withColumn("processed_timestamp", current_timestamp())
+
+//    finalDF.show(false)
+    finalDF.write.parquet(s"final/$city")
   }
 }

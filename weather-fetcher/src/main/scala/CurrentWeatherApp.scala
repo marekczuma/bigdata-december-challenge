@@ -30,6 +30,7 @@ object CurrentWeatherApp {
     val formatterDetailed = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")
     val timestampStringDetailed = currentDateTime.format(formatterDetailed)
     responseDF.write.mode(SaveMode.Overwrite).format("json").save(s"current/$city/$timestampStringDetailed")
+    responseDF.show(false)
     println("yo bros!")
   }
 
